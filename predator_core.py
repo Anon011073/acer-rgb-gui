@@ -7,7 +7,7 @@ CONFIG_DIR = os.path.expanduser("~/.config/predator/saved profiles")
 DEFAULTS_FILE = os.path.expanduser("~/.config/predator/default_settings.json")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
-MODE_MAP = {"static":0,"breath":1,"neon":2,"wave":3,"shifting":4,"zoom":5}
+MODE_MAP = {"static":0,"breath":1,"neon":3,"wave":2,"shifting":4,"zoom":5}
 
 def run_facer(mode, zone=None, color=None, speed=None, brightness=None, direction=None):
     mode_int = MODE_MAP.get(mode, 0)

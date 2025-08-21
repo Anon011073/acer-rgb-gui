@@ -42,7 +42,7 @@ class PredatorGUI(ctk.CTk):
             self.frame_main,
             values=list(run_facer.__globals__['MODE_MAP'].keys()),
             variable=self.mode_var,
-            command=lambda e: self.update_options(),
+            command=self.update_options,
             width=140,
             font=("Arial",14)
         )
@@ -58,9 +58,9 @@ class PredatorGUI(ctk.CTk):
         self.btn_frame.grid(row=2, column=0, columnspan=2, pady=10, sticky="ew", ipadx=5, ipady=5)
         ctk.CTkButton(self.btn_frame, text="Preview Effect", command=self.preview, font=("Arial",13)).grid(row=0, column=0, padx=5, pady=5, sticky="ew")
         ctk.CTkButton(self.btn_frame, text="Apply Effect", command=self.apply, font=("Arial",13)).grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        ctk.CTkButton(self.btn_frame, text="Save Profile", command=self.save, font=("Arial",13)).grid(row=1, column=0, padx=5, pady=5, sticky="ew")
-        ctk.CTkButton(self.btn_frame, text="Load Profile", command=self.load, font=("Arial",13)).grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        ctk.CTkButton(self.btn_frame, text="Random Effect", command=self.random_effect, font=("Arial",13)).grid(row=2, column=0, columnspan=2, pady=5, sticky="ew")
+        ctk.CTkButton(self.btn_frame, text="Random Effect", command=self.random_effect, font=("Arial",13)).grid(row=1, column=0, columnspan=2, pady=5, sticky="ew")
+        ctk.CTkButton(self.btn_frame, text="Save Profile", command=self.save, font=("Arial",13)).grid(row=2, column=0, padx=5, pady=5, sticky="ew")
+        ctk.CTkButton(self.btn_frame, text="Load Profile", command=self.load, font=("Arial",13)).grid(row=2, column=1, padx=5, pady=5, sticky="ew")
 
         # Make columns expand evenly
         self.btn_frame.columnconfigure(0, weight=1)
@@ -95,12 +95,13 @@ class PredatorGUI(ctk.CTk):
         mode = self.mode_var.get()
 
         if mode == "static":
-            ctk.CTkCheckBox(self.options_frame, text="All Zones", variable=self.all_zones_var, font=("Arial",13)).grid(row=row, column=0, sticky="w", pady=3)
-            ctk.CTkLabel(self.options_frame, text="Zone:", font=("Arial",13)).grid(row=row, column=1, sticky="w")
-            ctk.CTkSpinbox(self.options_frame, from_=1, to=4, textvariable=self.zone_var, width=50, font=("Arial",13)).grid(row=row, column=2, sticky="w")
+            ctk.CTkCheckBox(self.options_frame, text="All Zones", variable=self.all_zones_var, font=("Arial",13), command=self.update_options).grid(row=0, column=0, sticky="w", pady=3)
+            if not self.all_zones_var.get():
+                ctk.CTkLabel(self.options_frame, text="Zone:", font=("Arial",13)).grid(row=0, column=1, sticky="w")
+                ctk.CTkSpinbox(self.options_frame, from_=1, to=4, textvariable=self.zone_var, width=50, font=("Arial",13)).grid(row=0, column=2, sticky="w")
             row+=1
 
-        if mode in ["static", "breath", "shifting", "zoom"]:
+        if mode in ["static", "breath","shifting","zoom"]:
             ctk.CTkLabel(self.options_frame, text="Color:", font=("Arial",13)).grid(row=row, column=0, sticky="w", pady=3)
             color_dropdown = ctk.CTkOptionMenu(self.options_frame, values=["Red","Green","Blue"], variable=self.color_var, font=("Arial",13))
             color_dropdown.grid(row=row, column=1, sticky="w")
