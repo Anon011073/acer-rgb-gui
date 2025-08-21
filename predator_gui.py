@@ -1,5 +1,6 @@
 # predator_gui.py
 import customtkinter as ctk
+import tkinter
 from tkinter import messagebox, simpledialog
 import random
 import os
@@ -69,13 +70,17 @@ class PredatorGUI(ctk.CTk):
         self.profile_frame = ctk.CTkFrame(self.frame_main, corner_radius=10, fg_color="#222222")
         self.profile_frame.grid(row=3, column=0, columnspan=2, pady=10, sticky="ew", ipadx=5, ipady=5)
         ctk.CTkLabel(self.profile_frame, text="Saved Profiles:", font=("Arial",14)).grid(row=0, column=0, sticky="w", pady=(5,0))
-        self.profile_listbox = ctk.CTkTextbox(
+        self.profile_listbox = tkinter.Listbox(
             self.profile_frame,
-            height=120,
-            corner_radius=5,
-            fg_color="#1c1c1c",
-            text_color="#eeeeee",
-            font=("Arial",14)
+            height=6,
+            bg="#1c1c1c",
+            fg="#eeeeee",
+            selectbackground="#1f538d",
+            selectforeground="white",
+            font=("Arial",14),
+            borderwidth=0,
+            highlightthickness=0,
+            activestyle="none"
         )
         self.profile_listbox.grid(row=1, column=0, columnspan=2, sticky="ew")
         ctk.CTkButton(self.profile_frame, text="Delete Profile", command=self.delete_profile, font=("Arial",13)).grid(row=2, column=0, columnspan=2, pady=5, sticky="ew")
@@ -95,7 +100,7 @@ class PredatorGUI(ctk.CTk):
             ctk.CTkSpinbox(self.options_frame, from_=1, to=4, textvariable=self.zone_var, width=50, font=("Arial",13)).grid(row=row, column=2, sticky="w")
             row+=1
 
-        if mode in ["static","breath","shifting","zoom"]:
+        if mode in ["static", "breath", "shifting", "zoom"]:
             ctk.CTkLabel(self.options_frame, text="Color:", font=("Arial",13)).grid(row=row, column=0, sticky="w", pady=3)
             color_dropdown = ctk.CTkOptionMenu(self.options_frame, values=["Red","Green","Blue"], variable=self.color_var, font=("Arial",13))
             color_dropdown.grid(row=row, column=1, sticky="w")
@@ -150,26 +155,28 @@ class PredatorGUI(ctk.CTk):
             messagebox.showinfo("Saved",f"Profile '{profile_name}' saved!")
 
     def load(self):
-        selected = self.profile_listbox.get("sel.first","sel.last")
-        if not selected:
+        try:
+            selected_index = self.profile_listbox.curselection()[0]
+            profile_name = self.profile_listbox.get(selected_index)
+            load_profile(profile_name)
+            messagebox.showinfo("Loaded",f"Profile '{profile_name}' loaded!")
+        except IndexError:
             messagebox.showwarning("No selection","Select a profile to load")
-            return
-        profile_name = selected.strip()
-        load_profile(profile_name)
-        messagebox.showinfo("Loaded",f"Profile '{profile_name}' loaded!")
 
     def delete_profile(self):
-        selected = self.profile_listbox.get("sel.first","sel.last")
-        if not selected: return
-        profile_name = selected.strip()
-        if messagebox.askyesno("Confirm Delete", f"Delete profile '{profile_name}'?"):
-            os.remove(f"{os.path.expanduser('~/.config/predator/saved profiles')}/{profile_name}.json")
-            self.refresh_profiles()
+        try:
+            selected_index = self.profile_listbox.curselection()[0]
+            profile_name = self.profile_listbox.get(selected_index)
+            if messagebox.askyesno("Confirm Delete", f"Delete profile '{profile_name}'?"):
+                os.remove(f"{os.path.expanduser('~/.config/predator/saved profiles')}/{profile_name}.json")
+                self.refresh_profiles()
+        except IndexError:
+            messagebox.showwarning("No selection","Select a profile to delete")
 
     def refresh_profiles(self):
-        self.profile_listbox.delete("0.0","end")
+        self.profile_listbox.delete(0,"end")
         for profile in list_profiles():
-            self.profile_listbox.insert("end", profile+"\n")
+            self.profile_listbox.insert("end", profile)
 
     def random_effect(self):
         self.mode_var.set(random.choice(list(run_facer.__globals__['MODE_MAP'].keys())))
